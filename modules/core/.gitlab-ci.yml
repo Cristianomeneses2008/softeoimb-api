@@ -1,0 +1,50 @@
+stages:
+  - skeleton
+  - build
+  - staging
+  - production
+  
+variables:
+  MODULE: core
+  DIRECTORY: /var/docker/${MODULE}/www/modules
+
+skeleton:
+  stage: skeleton
+  tags:
+    - shell_staging_217
+  script:
+    - echo "Criando estrutura esqueleto projeto"
+    - echo  ${CI_COMMIT_REF_NAME}
+    - curl -X POST -F token=ffaa1ea79a9bcf610f64e19ec105f3 -F ref=${CI_COMMIT_REF_NAME} -F variables[MODULE]=${MODULE} https://gitlab.edebe.com.br/api/v4/projects/46/trigger/pipeline
+    
+  except:
+    - triggers
+
+build:
+  stage: build
+  tags:
+    - shell_staging_217
+  script:
+    - echo "Build App Staging2"
+    - mkdir -p ${DIRECTORY}/core
+    - pwd && ls -lha
+    
+staging:
+  stage: staging
+  tags:
+    - shell_staging_217
+  script: 
+    - echo "Deploy to staging server"
+    - rsync -avzorg $PWD/ --exclude=.env --stats --progress ${DIRECTORY}/core/
+  only:
+  - develop
+  
+production:
+  stage: production
+  tags:
+    - shell_prod_61
+  script: 
+    - echo "Deploy to staging server"
+    - rsync -avzorg $PWD/ --exclude=.env --stats --progress ${DIRECTORY}/core/
+  only:
+  - master
