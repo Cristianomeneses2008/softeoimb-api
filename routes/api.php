@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 //Public routes
 //Route::post('/register', [AuthController::class, 'register']);
 //Route::post('/login', [AuthController::class, 'login']);
-//Route::get('/produtos', [ProdutosController::class, 'index']);
+Route::get('/produtos', [ProdutosController::class, 'index']);
 
 //Protect routes
 Route::group(['middleware' => ['auth:sanctum']], function () {
